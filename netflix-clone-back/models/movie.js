@@ -15,4 +15,4 @@ const movieSchema = new Schema({
     isSeries: { type: Boolean, default: false }
 }, { timestamps: true });
 
-module.export = mongoose.model('Movie', movieSchema);
+module.exports = mongoose.model('Movie', movieSchema);
