@@ -1,5 +1,7 @@
-const User = require('../models/user');
 const bcrypt = require('bcryptjs');
+
+const HttpError = require('../models/http-error');
+const User = require('../models/user');
 
 exports.register = async (req, res, next) => {
     const { username, password, email } = req.body;
@@ -7,13 +9,13 @@ exports.register = async (req, res, next) => {
     try {
         hashedPassword = await bcrypt.hash(password, 12);
      } catch(err) {
-        return res.status(500).json(err);
+        return next(new HttpError(err));
     }
     const newUser = new User({ username: username, email: email, password: hashedPassword });
     try {
         await newUser.save();
     } catch (err) {
-        return res.status(500).json(err);
+        return next(new HttpError(err));
     }
     res.status(201).json(newUser);
 }
@@ -22,12 +24,11 @@ exports.login = async (req, res, next) => {
     const { email, password } = req.body;
     try {
         const user = await User.findOne({ email: email });
-        if (!user) return res.status(401).json('Wrong email');
+        if (!user) return next(new HttpError('Wrong email', null, 401));
         const isValid = await bcrypt.compare(password, user.password);
-        if (!isValid) return res.status(401).json("Wrong password");
-        const { userPassword, ...info } = user;
-        return res.status(200).json(info._doc);
+        if (!isValid) return next(new HttpError('Wrong password', null, 401));
+        return res.status(200).json(user);
     } catch(err) {
-        console.log(err);
+        return next(new HttpError(err));
     }
 }

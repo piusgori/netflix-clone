@@ -12,6 +12,15 @@ app.use(express.json());
 
 app.use('/api/auth', authRoute);
 
+app.use((req, res, next) => {
+    throw new HttpError('The page you are looking for could not be found', null, 404);
+  })
+  
+app.use((error, req, res, next) => {
+    res.status(error.code || 500);
+    res.json({ message: error.message || 'An Unknown error has occurred!', content: error.content || null })
+})
+
 
 mongoose.connect(mongoUrl).then(() => {
     app.listen(8000);
