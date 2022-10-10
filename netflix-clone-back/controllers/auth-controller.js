@@ -1,4 +1,5 @@
 const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
 
 const HttpError = require('../models/http-error');
 const User = require('../models/user');
@@ -27,7 +28,8 @@ exports.login = async (req, res, next) => {
         if (!user) return next(new HttpError('Wrong email', null, 401));
         const isValid = await bcrypt.compare(password, user.password);
         if (!isValid) return next(new HttpError('Wrong password', null, 401));
-        return res.status(200).json(user);
+        const accessToken = jwt.sign({ id: user._id, isAdmin: user.isAdmin }, 'netflix', { expiresIn: "5d" })
+        return res.status(200).json({...user, accessToken});
     } catch(err) {
         return next(new HttpError(err));
     }

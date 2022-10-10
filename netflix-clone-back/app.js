@@ -2,6 +2,7 @@ const express = require('express');
 const mongoose = require('mongoose');
 
 const authRoute = require('./routes/auth-route');
+const userRoute = require('./routes/user-route');
 const keys = require('./private/keys');
 
 const mongoUrl = `mongodb+srv://pius_gori:${keys.mongoPassword}@piuscluster.wvoqx.mongodb.net/netflix?retryWrites=true&w=majority`;
@@ -11,6 +12,7 @@ const app = express();
 app.use(express.json());
 
 app.use('/api/auth', authRoute);
+app.use('/api/users', userRoute);
 
 app.use((req, res, next) => {
     throw new HttpError('The page you are looking for could not be found', null, 404);
