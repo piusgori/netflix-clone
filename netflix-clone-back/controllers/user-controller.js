@@ -2,6 +2,7 @@ const bcrypt = require('bcryptjs');
 
 const User = require('../models/user');
 const HttpError = require('../models/http-error');
+const months = require('../middleware/months');
 
 exports.getUser = async (req, res, next) => {
     const userId = req.params.id;
@@ -16,10 +17,21 @@ exports.getUser = async (req, res, next) => {
 exports.getAll = async (req, res, next) => {
     const query = req.query.new;
     try {
-        const users = query ? await User.find().limit(10) : await User.find();
+        const users = query ? await User.find().sort({ _id: -1 }).limit(10) : await User.find();
         return res.status(200).json(users);
     } catch (err) {
         return next(new HttpError('Unable to get users'));
+    }
+}
+
+exports.stats = async (req, res, next) => {
+    const today = new Date();
+    const lastYear = today.setFullYear(today.setFullYear() - 1);
+    try {
+        const data = await User.aggregate([ { $project: { month: { $month: '$createdAt' } } }, { $group: { _id: "$month", total: { $sum: 1 } } } ]);
+        return res.status(200).json(data);
+    } catch (err) {
+        return next(new HttpError('A server side error'));
     }
 }
 
