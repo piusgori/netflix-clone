@@ -45,7 +45,7 @@ exports.update = async (req, res, next) => {
             return res.status(200).json(updatedUser);
         } catch (err) {
             return next(new HttpError('Unable to process'));
-        }
+        };
     } else {
         return next(new HttpError('Only update your account', null, 403));
     }
