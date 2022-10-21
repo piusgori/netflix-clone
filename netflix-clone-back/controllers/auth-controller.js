@@ -18,7 +18,8 @@ exports.register = async (req, res, next) => {
     } catch (err) {
         return next(new HttpError(err));
     }
-    res.status(201).json(newUser);
+    const createdUser = { username, email, isAdmin: newUser.isAdmin, profilePic: newUser.profilePic, id: newUser._id, createdAt: newUser.createdAt, updatedAt: newUser.updatedAt };
+    res.status(201).json(createdUser);
 }
 
 exports.login = async (req, res, next) => {
@@ -28,8 +29,9 @@ exports.login = async (req, res, next) => {
         if (!user) return next(new HttpError('Wrong email', null, 401));
         const isValid = await bcrypt.compare(password, user.password);
         if (!isValid) return next(new HttpError('Wrong password', null, 401));
-        const accessToken = jwt.sign({ id: user._id, isAdmin: user.isAdmin }, 'netflix', { expiresIn: "5d" })
-        return res.status(200).json({...user, accessToken});
+        const accessToken = jwt.sign({ id: user._id, isAdmin: user.isAdmin }, 'netflix', { expiresIn: "5d" });
+        const loggedUser = { username: user.username, email, isAdmin: user.isAdmin, profilePic: user.profilePic, id: user._id, createdAt: user.createdAt, updatedAt: user.updatedAt, token: accessToken };
+        return res.status(200).json(loggedUser);
     } catch(err) {
         return next(new HttpError(err));
     }

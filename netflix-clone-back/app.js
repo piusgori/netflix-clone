@@ -1,5 +1,6 @@
 const express = require('express');
 const mongoose = require('mongoose');
+const bodyParser = require('body-parser');
 
 const authRoute = require('./routes/auth-route');
 const userRoute = require('./routes/user-route');
@@ -11,7 +12,14 @@ const mongoUrl = `mongodb+srv://pius_gori:${keys.mongoPassword}@piuscluster.wvoq
 
 const app = express();
 
-app.use(express.json());
+app.use(bodyParser.json());
+
+app.use((req, res, next) => {
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization');
+    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PATCH, DELETE');
+    next();
+});
 
 app.use('/api/auth', authRoute);
 app.use('/api/users', userRoute);
