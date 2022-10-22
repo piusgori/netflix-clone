@@ -1,8 +1,26 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import './featured.scss';
 import { InfoOutlined, PlayArrow } from '@material-ui/icons';
+import axios from 'axios';
 
 const Featured = ({ type }) => {
+
+  const [content, setContent] = useState({});
+
+  useEffect(() => {
+    const getRandomContent = async () => {
+      try {
+        const config = { headers: { token: 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjYzNTI2Y2JhZWU2Yjk5YzdiNWU5ZWY2ZCIsImlzQWRtaW4iOmZhbHNlLCJpYXQiOjE2NjYzNDY2MDQsImV4cCI6MTY2Njc3ODYwNH0._VRhNSofwwHG-fkFdBgiFyQcKYXHgQxtCtCuTXwHpPU' } };
+        const res = await axios.get(`movies/random?type=${type}`, content);
+        setContent(res.data[0]);
+      } catch (err) {
+        console.log(err);
+      }
+    };
+
+    getRandomContent();
+  }, [type])
+
   return (
     <div className='featured'>
         {type && <div className='category'>
@@ -24,10 +42,10 @@ const Featured = ({ type }) => {
             <option value='documentary'>Documentary</option>
           </select>
         </div>}
-        <img src='https://cdn.pixabay.com/photo/2014/10/02/00/15/gas-mask-469217__340.jpg' alt='featured'></img>
+        <img src={content.img} alt='featured'></img>
         <div className='info'>
-          <img src='https://upload.wikimedia.org/wikipedia/commons/thumb/d/db/The-matrix-logo.svg/800px-The-matrix-logo.svg.png?20160129235253' alt='featured'></img>
-          <span className='desc'>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum</span>
+          <img src={content.imgTitle} alt='featured'></img>
+          <span className='desc'>{content.description}</span>
           <div className='buttons'>
             <button className='play'>
               <PlayArrow></PlayArrow>

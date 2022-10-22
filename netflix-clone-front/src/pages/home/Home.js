@@ -12,9 +12,9 @@ const Home = ({ type }) => {
 
   const getRandomLists = async () => {
     try {
-      const config = { headers: { token: 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjYzNTI2Y2JhZWU2Yjk5YzdiNWU5ZWY2ZCIsImlzQWRtaW4iOmZhbHNlLCJpYXQiOjE2NjYzNDY2MDQsImV4cCI6MTY2Njc3ODYwNH0._VRhNSofwwHG-fkFdBgiFyQcKYXHgQxtCtCuTXwHpPU' } }
+      const config = { headers: { token: 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjYzNTI2Y2JhZWU2Yjk5YzdiNWU5ZWY2ZCIsImlzQWRtaW4iOmZhbHNlLCJpYXQiOjE2NjYzNDY2MDQsImV4cCI6MTY2Njc3ODYwNH0._VRhNSofwwHG-fkFdBgiFyQcKYXHgQxtCtCuTXwHpPU' } };
       const response = await axios.get(`list${type ? `?type=${type}` : ""}${genre ? `&genre=${genre}` : ""}`, config);
-      console.log(response);
+      setLists(response.data);
     } catch (err) {
       console.log(err);
     }
@@ -29,9 +29,7 @@ const Home = ({ type }) => {
     <div className='home'>
         <Navbar></Navbar>
         <Featured type={type}></Featured>
-        <List></List>
-        <List></List>
-        <List></List>
+        {lists.map((each, index) => <List key={index} list={each}></List>)}
     </div>
   )
 }

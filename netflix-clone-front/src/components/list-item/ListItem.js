@@ -1,38 +1,52 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import './listItem.scss';
 import { Add, PlayArrow, ThumbDownOutlined, ThumbUpOutlined } from '@material-ui/icons';
+import axios from 'axios';
+import { Link } from 'react-router-dom';
 
-const ListItem = ({ index }) => {
+const ListItem = ({ index, itemId }) => {
 
   const [isHovered, setIsHovered] = useState(false);
-  const trailer = 'https://player.vimeo.com/external/624316893.sd.mp4?s=762a00cd52c988b3415d5dafd2716b79568451a1&profile_id=164&oauth2_token_id=57447761';
+  const [item, setItem] = useState({});
+
+  useEffect(() => {
+    const getMovie = async () => {
+      try {
+        const config = { headers: { token: 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjYzNTI2Y2JhZWU2Yjk5YzdiNWU5ZWY2ZCIsImlzQWRtaW4iOmZhbHNlLCJpYXQiOjE2NjYzNDY2MDQsImV4cCI6MTY2Njc3ODYwNH0._VRhNSofwwHG-fkFdBgiFyQcKYXHgQxtCtCuTXwHpPU' } };
+        const response = await axios.get(`movies/find/${itemId}`, config);
+        setItem(response.data);
+      } catch (err) {
+        console.log(err);
+      }
+    }
+
+    getMovie();
+  }, [itemId]);
 
   return (
-    <div style={{left: isHovered && index * 225 - 50 + index * 2.5}} onMouseEnter={() => setIsHovered(true)} onMouseLeave={() => setIsHovered(false)} className='listItem'>
-      <img alt='each' src='https://cdn.pixabay.com/photo/2016/11/22/23/44/porsche-1851246__340.jpg'></img>
-      {isHovered && <>
-        <video src={trailer} autoPlay progress loop></video>
-        <div className='itemInfo'>
-          <div className='icons'>
-            <PlayArrow className='icon'></PlayArrow>
-            <Add className='icon'></Add>
-            <ThumbUpOutlined className='icon'></ThumbUpOutlined>
-            <ThumbDownOutlined className='icon'></ThumbDownOutlined>
+    <Link to={{ pathname: '/watch', movie: item }}>
+      <div style={{left: isHovered && index * 225 - 50 + index * 2.5}} onMouseEnter={() => setIsHovered(true)} onMouseLeave={() => setIsHovered(false)} className='listItem'>
+        <img alt='each' src={item.img}></img>
+        {isHovered && <>
+          <video src={item.trailer} autoPlay progress loop></video>
+          <div className='itemInfo'>
+            <div className='icons'>
+              <PlayArrow className='icon'></PlayArrow>
+              <Add className='icon'></Add>
+              <ThumbUpOutlined className='icon'></ThumbUpOutlined>
+              <ThumbDownOutlined className='icon'></ThumbDownOutlined>
+            </div>
+            <div className='itemInfoTop'>
+              <span>{item.duration}</span>
+              <span className='limit'>{item.limit}</span>
+              <span>{item.year}</span>
+            </div>
+            <div className='description'>{item.description}</div>
+            <div className='genre'>{item.genre}</div>
           </div>
-          <div className='itemInfoTop'>
-            <span>1 hour 14 mins</span>
-            <span className='limit'>+16</span>
-            <span>1999</span>
-          </div>
-          <div className='description'>
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore
-          </div>
-          <div className='genre'>
-            Action
-          </div>
-        </div>
-      </>}
-    </div>
+        </>}
+      </div>
+    </Link>
   )
 }
 
